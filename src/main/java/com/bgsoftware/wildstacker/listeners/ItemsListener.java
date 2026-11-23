@@ -125,7 +125,9 @@ public final class ItemsListener implements Listener {
 
         StackedItem stackedItem = WStackedItem.of(e.getItem());
 
-        if (stackedItem.getStackAmount() > 1) {
+        // A non-cached item is not tracked by us, so its stack amount is just the vanilla
+        // item amount. Taking over the pickup for it only duplicates what vanilla already does.
+        if (stackedItem.isCached() && stackedItem.getStackAmount() > 1) {
             e.setCancelled(true);
             stackedItem.giveItemStack(e.getInventory());
             InventoryHolder inventoryHolder = e.getInventory().getHolder();
