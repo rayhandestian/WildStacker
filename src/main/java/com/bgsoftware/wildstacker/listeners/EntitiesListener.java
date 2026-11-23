@@ -166,20 +166,23 @@ public final class EntitiesListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityNerfDamage(EntityDamageByEntityEvent e) {
-        if (!plugin.getSettings().entitiesStackingEnabled)
+        cancelNerfedHit(plugin, e);
+    }
+
+    static void cancelNerfedHit(WildStackerPlugin plugin, EntityDamageEvent event) {
+        if (!(event instanceof EntityDamageByEntityEvent) || !plugin.getSettings().entitiesStackingEnabled)
             return;
 
-        if (!EntityUtils.isStackable(e.getDamager()))
+        Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
+
+        if (!EntityUtils.isStackable(damager))
             return;
 
-        StackedEntity stackedEntity = WStackedEntity.of(e.getDamager());
+        StackedEntity stackedEntity = WStackedEntity.of(damager);
 
-        if (!stackedEntity.isCached())
-            return;
-
-        if (stackedEntity.isNerfed()) {
-            e.setCancelled(true);
-            e.setDamage(0);
+        if (stackedEntity.isCached() && stackedEntity.isNerfed()) {
+            event.setCancelled(true);
+            event.setDamage(0);
         }
     }
 

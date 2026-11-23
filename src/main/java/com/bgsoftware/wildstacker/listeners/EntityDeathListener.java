@@ -79,6 +79,9 @@ public class EntityDeathListener implements Listener {
         // Making sure the entity is stackable and that we can proceed with handling entity damage
         if (damageEvent.isCancelled() || !plugin.getSettings().entitiesStackingEnabled ||
                 !EntityUtils.isStackable(damageEvent.getEntity())) {
+            // onEntityNerfDamage cancels a nerfed entity's hit anyway, but may run after this re-call.
+            // Cancelling it first shows other plugins a cancelled event instead of a hit that never lands.
+            EntitiesListener.cancelNerfedHit(plugin, damageEvent);
             // If not, we still want to re-call the damage event
             recallDamageEvent(damageEvent);
             return;
